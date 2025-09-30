@@ -1,9 +1,13 @@
 package com.example;
 
 import com.example.api.ElpriserAPI;
+import com.example.api.ElpriserAPI.Elpris;
 import com.example.api.ElpriserAPI.Prisklass;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class PriceApp {
 
@@ -22,5 +26,38 @@ public class PriceApp {
         System.out.println("Zon: " + zone);
         System.out.println("Datum: " + date);
         System.out.println("Laddningstid: " + chargingDuration);
+
+        List<Elpris> allPrices = fetchPrices(date, zone);
+
+        if (allPrices.isEmpty()) {
+            System.out.println("Nothing to do.");
+            return;
+        }
+
+        PriceLogic priceLogic = new PriceLogic(allPrices);
+
+        priceLogic.printStatistics();
+
     }
+
+    private List<Elpris> fetchPrices(LocalDate startDay, Prisklass prisklass) {
+        System.out.println("hämtar priser för valt datum");
+        List<ElpriserAPI.Elpris> todayPrices = api.getPriser(startDay, prisklass);
+
+        List<Elpris> tomorrowPrices = Collections.emptyList();
+
+        LocalDate nextDay = startDay.plusDays(1);
+
+        System.out.println("Hämtar priser för...");
+        tomorrowPrices = api.getPriser(nextDay, prisklass);
+
+        List<Elpris> allPrices = new ArrayList<>(todayPrices);
+        allPrices.addAll(tomorrowPrices);
+
+        return allPrices;
+
+    }
+
+
+
 }

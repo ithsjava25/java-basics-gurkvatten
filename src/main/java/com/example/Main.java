@@ -5,7 +5,6 @@ import com.example.api.ElpriserAPI.Prisklass;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
-import com.example.PriceApp;
 
 public class Main {
 
