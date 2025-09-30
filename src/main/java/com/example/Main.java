@@ -8,7 +8,7 @@ public class Main {
 
 
         for (String arg : args) {
-            System.out.println("Antal argument" + args.length);
+            System.out.println(args.length);
         }
     }
 }
