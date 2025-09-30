@@ -11,44 +11,49 @@ import java.time.format.DateTimeFormatter;
 
 public class ChargeSorter {
 
-    private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
-    public static void findOptimalWindow(List<Elpris> elprises, int durationHours) {
+    public static void findAndPrintOptimalWindow(List<Elpris> allPrices, int durationHours) {
 
-        if (elprises.size() < durationHours) {
+
+        if (allPrices.size() < durationHours) {
             System.err.printf("\nOBS: Hittade bara %d timmars priser. Kan inte garantera ett %d timmars fönster.\n",
-                    elprises.size(), durationHours);
+                    allPrices.size(), durationHours);
             return;
         }
 
         double minTotalCost = Double.MAX_VALUE;
-        int optimalStart = -1;
+        int optimalStartIndex = -1;
 
-        for ( int i = 0; i <= elprises.size() - durationHours; i++) {
+        for (int i = 0; i <= allPrices.size() - durationHours; i++) {
             double currentTotalCost = 0.0;
 
-            for (int j = 0; j < durationHours; j++)  {
-                currentTotalCost += elprises.get(i + j).sekPerKWh();
+            for (int j = 0; j < durationHours; j++) {
+                currentTotalCost += allPrices.get(i + j).sekPerKWh();
             }
+
             if (currentTotalCost < minTotalCost) {
                 minTotalCost = currentTotalCost;
-                optimalStart = i;
+                optimalStartIndex = i;
             }
         }
-        if (optimalStart == -1) {
-            Elpris startPrice = elprises.get(optimalStart);
-            Elpris endPrice = elprises.get(optimalStart + durationHours - 1);
 
+        if (optimalStartIndex != -1) {
+            Elpris startPrice = allPrices.get(optimalStartIndex);
+            Elpris endPrice = allPrices.get(optimalStartIndex + durationHours - 1);
+
+
+            System.out.println("\nPåbörja laddning...");
             System.out.println("\n=========================================");
             System.out.printf("   Optimalt Laddningsfönster (%dh)   \n", durationHours);
             System.out.println("=========================================");
-            System.out.printf("Starttid:    %s\n", startPrice.timeStart().format(timeFormatter));
-            System.out.printf("Sluttid:     %s\n", endPrice.timeEnd().format(timeFormatter));
+            System.out.printf("Starttid:    %s\n", startPrice.timeStart().format(TIME_FORMATTER));
+            System.out.printf("Sluttid:     %s\n", endPrice.timeEnd().format(TIME_FORMATTER));
             System.out.printf("Medelpris:   %.4f SEK/kWh\n", minTotalCost / durationHours);
             System.out.printf("Total kostn: %.4f SEK (över %d timmar)\n", minTotalCost, durationHours);
             System.out.println("-----------------------------------------");
         }
-        }
+    }
 
 
     }
