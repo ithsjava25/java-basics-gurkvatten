@@ -38,6 +38,21 @@ public class PriceApp {
 
         priceLogic.printStatistics();
 
+        if (chargingDuration != null) {
+            try {
+                int duration = Integer.parseInt(chargingDuration.replace("h",""));
+
+                if (duration == 2 || duration == 4 || duration == 8 ) {
+                    ChargeSorter.findOptimalWindow(allPrices, duration);
+                } else  {
+                    System.out.println("Fel: Laddningen måste vara 2h, 4h eller 8h.");
+                }
+            } catch (NumberFormatException e) {
+                System.err.println("Fel ogiltig längd för laddning");
+            }
+
+        }
+
     }
 
     private List<Elpris> fetchPrices(LocalDate startDay, Prisklass prisklass) {
