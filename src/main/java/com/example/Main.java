@@ -1,6 +1,11 @@
 package com.example;
 
 import com.example.api.ElpriserAPI;
+import com.example.api.ElpriserAPI.Prisklass;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+
+import com.example.PriceApp;
 
 public class Main {
 
@@ -40,6 +45,46 @@ public class Main {
                         break;
                 }
             }
+            if (showHelp) {
+                printHelp();
+                return;
+            }
+
+            if (zoneStr == null) return;
+            if (dateStr == null) return;
+
+            PriceApp priceApp = new PriceApp();
+
+
+        }
+
+    }
+    private static Prisklass validateAndParseZone(String zoneStr) {
+        if (zoneStr == null) {
+            System.err.println("Fel: Zonen måste anges via --zone.");
+            printHelp();
+            return null;
+        }
+        try {
+            // valueOf konverterar "SE3" till Prisklass.SE3
+            return Prisklass.valueOf(zoneStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            System.err.println("Fel: Ogiltig zon '" + zoneStr + "'. Välj SE1, SE2, SE3 eller SE4.");
+            return null;
+        }
+
+
+    }
+    private static LocalDate validateAndParseDate(String dateStr) {
+        if (dateStr == null) {
+            return LocalDate.now(); // Standard: Idag
+        }
+        try {
+            // LocalDate.parse klarar YYYY-MM-DD formatet som standard
+            return LocalDate.parse(dateStr);
+        } catch (DateTimeParseException e) {
+            System.err.println("Fel: Ogiltigt datumformat '" + dateStr + "'. Använd YYYY-MM-DD.");
+            return null;
         }
     }
 }
