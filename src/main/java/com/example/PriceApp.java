@@ -18,6 +18,9 @@ public class PriceApp {
     }
 
     public void run(Prisklass zone, LocalDate date,String chargingDuration, boolean isSorted) {
-
+        System.out.println("--- App Körs---");
+        System.out.println("Zon: " + zone);
+        System.out.println("Datum: " + date);
+        System.out.println("Laddningstid: " + chargingDuration);
     }
 }
