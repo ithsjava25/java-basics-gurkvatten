@@ -1,9 +1,80 @@
 package com.example;
 
-import com.example.api.ElpriserAPI;
+import com.example.api.ElpriserAPI.Prisklass;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 public class Main {
+
+    private static void printHelp() {
+        System.out.println("⚡️ Electricity Price Optimizer CLI");
+        System.out.println("Usage: --zone <SE1, SE2, SE3, SE4> [--date YYYY-MM-DD] [--charging 2h|4h|8h] [--sorted] [--help]");
+    }
+
     public static void main(String[] args) {
-        ElpriserAPI elpriserAPI = new ElpriserAPI();
+        String zoneStr = null;
+        String dateStr = null;
+        String chargingDurationStr = null;
+        boolean isSorted = false;
+        boolean showHelp = false;
+
+        for (int i = 0; i < args.length; i++) {
+            switch (args[i]) {
+                case "--zone":
+                    if (i + 1 < args.length) zoneStr = args[++i];
+                    break;
+                case "--date":
+                    if (i + 1 < args.length) dateStr = args[++i];
+                    break;
+                case "--charging":
+                    if (i + 1 < args.length) chargingDurationStr = args[++i];
+                    break;
+                case "--sorted":
+                    isSorted = true;
+                    break;
+                case "--help":
+                    showHelp = true;
+                    break;
+            }
+        }
+
+        if (showHelp) {
+            printHelp();
+            return;
+        }
+
+        Prisklass zone = validateAndParseZone(zoneStr);
+        LocalDate date = validateAndParseDate(dateStr);
+
+        if (zone == null || date == null) return;
+
+        PriceApp app = new PriceApp();
+        app.run(zone, date, chargingDurationStr, isSorted);
+    }
+
+    private static Prisklass validateAndParseZone(String zoneStr) {
+        if (zoneStr == null) {
+            System.err.println("Fel: Zonen måste anges via --zone.(invalid zone)");
+            printHelp();
+            return null;
+        }
+        try {
+            return Prisklass.valueOf(zoneStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            System.out.println("Fel: Ogiltig zon '" + zoneStr + "'. Välj SE1, SE2, SE3 eller SE4. (ogiltig zon)");
+            return null;
+        }
+    }
+
+    private static LocalDate validateAndParseDate(String dateStr) {
+        if (dateStr == null) {
+            return LocalDate.now();
+        }
+        try {
+            return LocalDate.parse(dateStr);
+        } catch (DateTimeParseException e) {
+            System.out.println("Fel: Ogiltigt datumformat '" + dateStr + "'. Använd YYYY-MM-DD. (ogiltigt datum)");
+            return null;
+        }
     }
 }
