@@ -17,15 +17,49 @@ public class PriceLogic {
         this.elprises = elprises;
     }
 
-    public double calculateMeanPrice() {
-        if (elprises.isEmpty()) return 0;
-
-        int count = Math.min(elprises.size(), 24);
-        double sum = 0.0;
-        for (int i = 0; i < count; i++) {
-            sum += elprises.get(i).sekPerKWh();
+    private double calculateMeanPrice() {
+        if (elprises == null || elprises.isEmpty()) {
+            return 0.0;
         }
-        return sum / count;
+
+
+        if (elprises.size() > 24) {
+
+
+            double hourlyMeanSum = 0.0;
+            int numberOfHours = 0;
+
+
+            for (int i = 0; i < elprises.size(); i += 4) {
+                double hourSum = 0.0;
+                int count = 0;
+
+
+                for (int j = 0; j < 4; j++) {
+                    if (i + j < elprises.size()) {
+                        hourSum += elprises.get(i + j).sekPerKWh();
+                        count++;
+                    }
+                }
+
+                if (count > 0) {
+
+                    hourlyMeanSum += hourSum / count;
+                    numberOfHours++;
+                }
+            }
+
+
+            return numberOfHours > 0 ? hourlyMeanSum / numberOfHours : 0.0;
+
+        } else {
+
+            double totalSum = 0.0;
+            for (Elpris pris : elprises) {
+                totalSum += pris.sekPerKWh();
+            }
+            return totalSum / elprises.size();
+        }
     }
 
     public Elpris findCheapestElpris() {
@@ -54,6 +88,32 @@ public class PriceLogic {
         }
         return maxPrice;
     }
+    private double calculateHourlyMeanAround(Elpris pris) {
+
+        if (elprises.size() <= 24) {
+            return pris.sekPerKWh();
+        }
+
+
+        int index = elprises.indexOf(pris);
+
+
+        int hourStartIndex = (index / 4) * 4;
+
+        double sum = 0;
+        int count = 0;
+
+
+        for (int i = 0; i < 4; i++) {
+            int currentIdx = hourStartIndex + i;
+            if (currentIdx < elprises.size()) {
+                sum += elprises.get(currentIdx).sekPerKWh();
+                count++;
+            }
+        }
+        return count > 0 ? sum / count : 0;
+    }
+
 
     private String formatPrice(double price, int decimals) {
         return String.format(SVEDISH_LOCALE, "%." + decimals + "f", price);
@@ -69,27 +129,40 @@ public class PriceLogic {
         Elpris minPrice = findCheapestElpris();
         Elpris maxPrice = findMostExpensiveElpris();
 
-        System.out.printf("Medelpris: %s öre/kWh\n", formatPrice(meanPriceOre, 2));
+        System.out.printf("Medelpris: %s öre\n", formatPrice(meanPriceOre, 2));
 
         if( minPrice != null) {
+
+            // Hämta det nya priset: Medelpriset för den billigaste timmen (i SEK)
+            double meanPriceOfCheapestHour = calculateHourlyMeanAround(minPrice) * 100;
+
+
+            // ... (din befintliga timeInterval logik)
             String timeInterval = minPrice.timeStart().format(DateTimeFormatter.ofPattern("HH"))
                     + "-"
-                    + minPrice.timeEnd().format(DateTimeFormatter.ofPattern("HH"));
+                    + minPrice.timeStart().plusHours(1).format(DateTimeFormatter.ofPattern("HH"));
             String startTime = minPrice.timeStart().format(TIME_FORMATTER);
 
-            System.out.printf("Lägsta pris: %s SEK/kWh (%s) kl %s\n",
-                    formatPrice(minPrice.sekPerKWh(), 4), timeInterval, startTime);
+            // Utskrift: Visa 11,50 öre/kWh
+            System.out.printf("Lägsta pris: %s öre/kWh (%s) kl %s\n",
+                    formatPrice(meanPriceOfCheapestHour, 2), timeInterval, startTime);
         }
 
         if(maxPrice != null) {
-            String timeInterval = maxPrice.timeStart().format(DateTimeFormatter.ofPattern("HH"))
-                    + "-"
-                    + maxPrice.timeEnd().format(DateTimeFormatter.ofPattern("HH"));
+
+            double meanPriceOfMostExpensiveHour = calculateHourlyMeanAround(maxPrice) * 100;
+
+
+            String startHour = maxPrice.timeStart().format(DateTimeFormatter.ofPattern("HH"));
+
+            String timeInterval = startHour + "-" +
+                    maxPrice.timeStart().plusHours(1).format(DateTimeFormatter.ofPattern("HH"));
 
             String startTime = maxPrice.timeStart().format(TIME_FORMATTER);
 
-            System.out.printf("Högsta pris: %s SEK/kWh (%s) kl %s\n",
-                    formatPrice(maxPrice.sekPerKWh(), 4), timeInterval, startTime);
+
+            System.out.printf("Högsta pris: %s öre/kWh (%s) kl %s\n",
+                    formatPrice(meanPriceOfMostExpensiveHour, 2), timeInterval, startTime);
         }
         System.out.println("-----------------------------------------");
     }
