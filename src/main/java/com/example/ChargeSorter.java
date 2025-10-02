@@ -47,11 +47,9 @@ public class ChargeSorter {
             double meanPrice = minTotalCost / durationHours;
             double meanPriceOre = meanPrice * 100;
 
-            String formattedMeanPrice = String.format("%.2f", meanPriceOre);
+            String formattedMeanPrice = String.format(SVEDISH_LOCALE, "%.2f", meanPriceOre);
 
-
-
-
+            String formattedTotalCost = String.format(SVEDISH_LOCALE, "%.4f", minTotalCost);
 
             System.out.println("\nPåbörja laddning...");
             System.out.println("\n=========================================");
@@ -60,7 +58,7 @@ public class ChargeSorter {
             System.out.printf("Starttid:    kl %s\n", startPrice.timeStart().format(TIME_FORMATTER));
             System.out.printf("Sluttid:    kl %s\n", endPrice.timeEnd().format(TIME_FORMATTER));
             System.out.printf("Medelpris för fönster: %s öre\n", formattedMeanPrice);
-            System.out.printf("Total kostn: %.4f SEK (över %d timmar)\n", minTotalCost, durationHours);
+            System.out.printf("Total kostn: %s SEK (över %d timmar)\n", formattedTotalCost, durationHours);
             System.out.println("-----------------------------------------");
         }
     }
