@@ -54,14 +54,14 @@ public class Main {
 
     private static Prisklass validateAndParseZone(String zoneStr) {
         if (zoneStr == null) {
-            System.err.println("Fel: Zonen måste anges via --zone.");
+            System.err.println("Fel: Zonen måste anges via --zone.(invalid zone)");
             printHelp();
             return null;
         }
         try {
             return Prisklass.valueOf(zoneStr.toUpperCase());
         } catch (IllegalArgumentException e) {
-            System.err.println("Fel: Ogiltig zon '" + zoneStr + "'. Välj SE1, SE2, SE3 eller SE4. (ogiltig zon)");
+            System.out.println("Fel: Ogiltig zon '" + zoneStr + "'. Välj SE1, SE2, SE3 eller SE4. (ogiltig zon)");
             return null;
         }
     }
@@ -73,7 +73,7 @@ public class Main {
         try {
             return LocalDate.parse(dateStr);
         } catch (DateTimeParseException e) {
-            System.err.println("Fel: Ogiltigt datumformat '" + dateStr + "'. Använd YYYY-MM-DD. (ogiltigt datum)");
+            System.out.println("Fel: Ogiltigt datumformat '" + dateStr + "'. Använd YYYY-MM-DD. (ogiltigt datum)");
             return null;
         }
     }

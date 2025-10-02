@@ -5,6 +5,7 @@ import com.example.api.ElpriserAPI.Elpris;
 import java.util.Date;
 import java.util.List;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 
 // Sliding window
@@ -12,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 public class ChargeSorter {
 
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
+    private static final Locale SVEDISH_LOCALE = new Locale("sv", "SE");
 
     public static void findAndPrintOptimalWindow(List<Elpris> allPrices, int durationHours) {
 
@@ -42,14 +44,22 @@ public class ChargeSorter {
             Elpris startPrice = allPrices.get(optimalStartIndex);
             Elpris endPrice = allPrices.get(optimalStartIndex + durationHours - 1);
 
+            double meanPrice = minTotalCost / durationHours;
+            double meanPriceOre = meanPrice * 100;
+
+            String formattedMeanPrice = String.format("%.2f", meanPriceOre);
+
+
+
+
 
             System.out.println("\nPåbörja laddning...");
             System.out.println("\n=========================================");
             System.out.printf("   Optimalt Laddningsfönster (%dh)   \n", durationHours);
             System.out.println("=========================================");
-            System.out.printf("Starttid:    %s\n", startPrice.timeStart().format(TIME_FORMATTER));
-            System.out.printf("Sluttid:     %s\n", endPrice.timeEnd().format(TIME_FORMATTER));
-            System.out.printf("Medelpris:   %.4f SEK/kWh\n", minTotalCost / durationHours);
+            System.out.printf("Starttid:    kl %s\n", startPrice.timeStart().format(TIME_FORMATTER));
+            System.out.printf("Sluttid:    kl %s\n", endPrice.timeEnd().format(TIME_FORMATTER));
+            System.out.printf("Medelpris för fönster: %s öre\n", formattedMeanPrice);
             System.out.printf("Total kostn: %.4f SEK (över %d timmar)\n", minTotalCost, durationHours);
             System.out.println("-----------------------------------------");
         }

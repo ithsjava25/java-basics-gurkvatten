@@ -75,9 +75,10 @@ public class PriceLogic {
             String timeInterval = minPrice.timeStart().format(DateTimeFormatter.ofPattern("HH"))
                     + "-"
                     + minPrice.timeEnd().format(DateTimeFormatter.ofPattern("HH"));
+            String startTime = minPrice.timeStart().format(TIME_FORMATTER);
 
-            System.out.printf("Lägsta pris: %s SEK/kWh (%s)\n",
-                    formatPrice(minPrice.sekPerKWh(), 4), timeInterval);
+            System.out.printf("Lägsta pris: %s SEK/kWh (%s) kl %s\n",
+                    formatPrice(minPrice.sekPerKWh(), 4), timeInterval, startTime);
         }
 
         if(maxPrice != null) {
@@ -85,8 +86,10 @@ public class PriceLogic {
                     + "-"
                     + maxPrice.timeEnd().format(DateTimeFormatter.ofPattern("HH"));
 
-            System.out.printf("Högsta pris: %s SEK/kWh (%s)\n",
-                    formatPrice(maxPrice.sekPerKWh(), 4), timeInterval);
+            String startTime = maxPrice.timeStart().format(TIME_FORMATTER);
+
+            System.out.printf("Högsta pris: %s SEK/kWh (%s) kl %s\n",
+                    formatPrice(maxPrice.sekPerKWh(), 4), timeInterval, startTime);
         }
         System.out.println("-----------------------------------------");
     }

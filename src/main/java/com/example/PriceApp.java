@@ -24,7 +24,7 @@ public class PriceApp {
         List<Elpris> allPrices = fetchPrices(date, zone);
 
         if (allPrices.isEmpty()) {
-            System.out.println("Kunde inte hämta några priser. Avslutar.");
+            System.out.println("inga priser. Avslutar.");
             return;
         }
 
